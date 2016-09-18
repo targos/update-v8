@@ -1,0 +1,24 @@
+{
+  "name": "update-v8",
+  "version": "0.0.0",
+  "description": "CLI to simplify updates to V8 in the Node.js project",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": "bin/update-v8.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/targos/update-v8.git"
+  },
+  "keywords": [],
+  "author": "Michaël Zasso",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/targos/update-v8/issues"
+  },
+  "homepage": "https://github.com/targos/update-v8#readme",
+  "dependencies": {
+    "mkdirp": "^0.5.1"
+  }
+}
