@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/targos/update-v8#readme",
   "dependencies": {
-    "mkdirp": "^0.5.1"
+    "mkdirp": "^0.5.1",
+    "rimraf": "^2.5.4"
   }
 }

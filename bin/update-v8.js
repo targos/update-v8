@@ -9,6 +9,9 @@ switch (args[0]) {
     case 'minor':
         updateV8.updateMinor();
         break;
+    case 'major':
+        updateV8.updateMajor(args.slice(1));
+        break;
     default:
         console.error(`Unknown command: ${args[0]}`);
         break;
