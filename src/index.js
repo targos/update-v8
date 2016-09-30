@@ -30,18 +30,24 @@ exports.updateMinor = function (options = {}) {
 
 exports.updateMajor = function (options = {}) {
     console.log('Starting major update');
-    const {cwd = process.cwd()} = options;
+    const {cwd = process.cwd(), args} = options;
     checkCwd(cwd);
     const nodeV8Version = getNodeV8Version(cwd);
-    const v8LkgrBranch = getV8LkgrBranch(nodeV8Version);
-    checkoutV8Branch(v8LkgrBranch);
+    let v8Branch;
+    if (args[0]) {
+        v8Branch = args[0];
+        console.log('Forcing update to ' + v8Branch);
+    } else {
+        v8Branch = getV8LkgrBranch(nodeV8Version);
+    }
+    checkoutV8Branch(v8Branch);
     rimraf.sync(path.join(cwd, 'deps/v8'));
-    cloneLocalV8(cwd, v8LkgrBranch);
+    cloneLocalV8(cwd, v8Branch);
     child_process.execFileSync('git', ['add', 'deps/v8'], {cwd});
-    child_process.execFileSync('git', ['commit', '-m', `deps: update V8 to ${v8LkgrBranch}`], {cwd});
+    child_process.execFileSync('git', ['commit', '-m', `deps: update V8 to ${v8Branch}`], {cwd});
     copyTraceEvent(cwd);
     copyGtest(cwd);
-    console.log(`Updated to ${v8LkgrBranch}`);
+    console.log(`Updated to ${v8Branch}`);
 };
 
 function doMinorUpdate(nodeV8Version, latestV8Version, cwd) {
@@ -127,6 +133,11 @@ function getV8LkgrBranch(nodeV8Version) {
 }
 
 function checkoutV8Branch(branch) {
+    // Checkout another branch to allow deleting master
+    child_process.execFileSync('git', ['checkout', 'origin/master'], {
+        cwd: clonedir,
+        stdio: 'ignore'
+    });
     try {
         child_process.execFileSync('git', ['branch', '-D', branch], {
             cwd: clonedir,
