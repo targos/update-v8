@@ -144,9 +144,7 @@ function checkoutV8Branch(branch) {
             stdio: 'pipe'
         });
     } catch (e) {
-        if (!e.message.includes(`error: branch '${branch}' not found`)) {
-            die(e.message);
-        }
+      // ignore
     }
     try {
         child_process.execFileSync('git', ['branch', branch, 'origin/' + branch], {
