@@ -15,6 +15,7 @@ const v8Git = chromiumGit + '/v8/v8.git';
 
 exports.updateMinor = function (options = {}) {
     console.log('Starting minor update');
+    updateClone();
     const {cwd = process.cwd()} = options;
     checkCwd(cwd);
     const nodeV8Version = getNodeV8Version(cwd);
@@ -30,6 +31,7 @@ exports.updateMinor = function (options = {}) {
 
 exports.updateMajor = function (options = {}) {
     console.log('Starting major update');
+    updateClone();
     const {cwd = process.cwd(), args} = options;
     checkCwd(cwd);
     const nodeV8Version = getNodeV8Version(cwd);
@@ -103,7 +105,6 @@ function cloneLocalV8(cwd, branch) {
 }
 
 function getLatestV8Version(nodeV8Version) {
-    updateClone();
     const nodeV8Tag = nodeV8Version.slice(0, 3).join('.');
     let tags = child_process.execFileSync('git', ['tag', '-l', nodeV8Tag + '.*'], {cwd: clonedir}).toString();
     tags = toSortedArray(tags);
@@ -111,7 +112,6 @@ function getLatestV8Version(nodeV8Version) {
 }
 
 function getV8LkgrBranch(nodeV8Version) {
-    updateClone();
     const currentMajor = nodeV8Version[0] + '.' + nodeV8Version[1];
     let tags = child_process.execFileSync('git', ['branch', '-r', '--list', 'origin/*lkgr'], {cwd: clonedir}).toString()
         .split(/[\r\n]+/)
