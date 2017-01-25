@@ -92,7 +92,7 @@ function execGitV8(...options) {
 
 function* addToGitignore(nodeDir, value) {
     const gitignorePath = path.join(nodeDir, 'deps/v8/.gitignore');
-    yield fs.appendFile(gitignorePath, '\n' + value + '\n');
+    yield fs.appendFile(gitignorePath, value + '\n');
 }
 
 function* replaceGitignore(nodeDir, options) {
