@@ -2,6 +2,7 @@
 
 const Listr = require('listr');
 
+const backport = require('./backport');
 const commitUpdate = require('./commitUpdate');
 const majorUpdate = require('./majorUpdate');
 const minorUpdate = require('./minorUpdate');
@@ -21,6 +22,15 @@ exports.minor = function (options) {
         updateV8Clone(),
         minorUpdate(),
         commitUpdate()
+    ], getOptions(options));
+    return tasks.run(options);
+};
+
+exports.backport = function (options) {
+    const tasks = new Listr([
+        updateV8Clone(),
+        backport.doBackport(),
+        backport.commitBackport()
     ], getOptions(options));
     return tasks.run(options);
 };

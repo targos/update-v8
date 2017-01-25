@@ -10,7 +10,6 @@ $ npm install -g update-v8
 
 ## Usage
 
-Assuming current working directory is the root of a Node git clone.  
 This tool will maintain a clone of the V8 repository in `~/.update-v8/v8`
 
 ### `update-v8 minor`
@@ -22,9 +21,17 @@ If the `git apply` command fails, a patch file will be written in the current di
 
 Replaces `deps/v8` with the `lkgr` branch or with `branchName` if it is specified.
 
+### `update-v8 backport --sha=SHA`
+
+Fetches and applies the patch corresponding to SHA. Increments the V8 patch version
+and commits the changes.  
+If the `git apply` command fails, a patch file will be written in the current directory.
+
 ### Options
 
 #### `--node-dir=/path/to/node`
+
+Specify path to the Node.js git repository. Defaults to current working directory.
 
 #### `--verbose`
 
