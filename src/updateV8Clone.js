@@ -30,6 +30,7 @@ function fetchOrigin() {
                 .catch(e => {
                     if (e.code === 'ENOENT') {
                         ctx.shouldClone = true;
+                        task.skip('V8 clone not present, create it.');
                     } else {
                         throw e;
                     }
@@ -45,6 +46,6 @@ function createClone() {
             mkdirp.sync(baseDir);
             return execa('git', ['clone', v8Git], {cwd: baseDir});
         },
-        skip: (ctx) => !ctx.shouldClone
+        enabled: (ctx) => ctx.shouldClone
     };
 }
