@@ -60,7 +60,7 @@ function minorUpdate() {
 
 function* doMinorUpdate(ctx, latestStr) {
     const currentStr = ctx.currentVersion.join('.');
-    const diff = yield execa.stdout('git', ['diff', currentStr, latestStr], {cwd: v8CloneDir});
+    const diff = yield execa.stdout('git', ['format-patch', '--stdout', `${currentStr}...${latestStr}`], {cwd: v8CloneDir});
     try {
         yield execa('git', ['apply', '--directory', 'deps/v8'], {
             cwd: ctx.nodeDir,
