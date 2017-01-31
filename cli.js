@@ -30,14 +30,15 @@ const defaultOptions = {
     verbose: false
 };
 
+const options = Object.assign({}, defaultOptions, cli.flags);
+options.nodeDir = path.resolve(options.nodeDir);
+
 return Promise
     .resolve()
     .then(() => {
         if (cli.input.length !== 1) {
             cli.showHelp();
         } else {
-            const options = Object.assign({}, defaultOptions, cli.flags);
-            options.nodeDir = path.resolve(options.nodeDir);
             switch (cli.input[0].toLowerCase()) {
                 case 'minor':
                     return updateV8.minor(options);
@@ -51,6 +52,6 @@ return Promise
         }
     })
     .catch(err => {
-        console.error(logSymbols.error, err.message);
+        console.error(logSymbols.error, options.verbose ? err.stack : err.message);
         process.exitCode = 1;
     });
