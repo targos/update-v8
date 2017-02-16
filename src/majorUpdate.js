@@ -29,6 +29,7 @@ module.exports = function () {
                 checkoutBranch(),
                 removeDepsV8(),
                 cloneLocalV8(),
+                removeDepsV8Git(),
                 updateV8Deps()
             ]);
         }
@@ -58,6 +59,13 @@ function cloneLocalV8() {
     return {
         title: 'Clone branch to deps/v8',
         task: (ctx) => execa('git', ['clone', '-b', ctx.branch, v8CloneDir, 'deps/v8'], {cwd: ctx.nodeDir})
+    };
+}
+
+function removeDepsV8Git() {
+    return {
+        title: 'Remove deps/v8/.git',
+        task: (ctx) => rimraf(path.join(ctx.nodeDir, 'deps/v8/.git'))
     };
 }
 
