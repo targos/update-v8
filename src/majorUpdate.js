@@ -1,6 +1,5 @@
 'use strict';
 
-const co = require('co');
 const execa = require('execa');
 const fs = require('fs-promise');
 const Listr = require('listr');
@@ -39,11 +38,20 @@ module.exports = function () {
 function checkoutBranch() {
     return {
         title: 'Checkout V8 branch',
-        task: (ctx) => {
-            const branch = ctx.branch;
-            return execGitV8('checkout', 'origin/master')
-                .then(() => execGitV8('branch', '-D', branch).catch(noop))
-                .then(() => execGitV8('branch', branch, `origin/${branch}`));
+        task: async (ctx) => {
+            let branch = ctx.branch;
+            await execGitV8('checkout', 'origin/master');
+            if (branch === 'lkgr') {
+                // try to get the latest tag
+                const res = await execGitV8('tag', '--contains', '4f426e1', '--sort', 'version:refname');
+                const tags = res.stdout.split('\n');
+                const lastTag = tags[tags.length - 1];
+                if (lastTag) branch = ctx.branch = lastTag;
+            }
+            try {
+                await execGitV8('branch', '-D', branch);
+            } catch (e) {}
+            await execGitV8('branch', branch, `origin/${branch}`);
         }
     };
 }
@@ -72,24 +80,22 @@ function removeDepsV8Git() {
 function updateV8Deps() {
     return {
         title: 'Update V8 DEPS',
-        task: (ctx) => {
-            return co(function*() {
-                const newV8Version = util.getNodeV8Version(ctx.nodeDir);
-                const deps = util.getV8Deps(newV8Version);
-                if (deps.length === 0) return;
-                for (const dep of deps) {
-                    if (dep.gitignore) {
-                        if (typeof dep.gitignore === 'string') {
-                            yield addToGitignore(ctx.nodeDir, dep.gitignore);
-                        } else {
-                            yield replaceGitignore(ctx.nodeDir, dep.gitignore);
-                        }
+        task: async (ctx) => {
+            const newV8Version = util.getNodeV8Version(ctx.nodeDir);
+            const deps = util.getV8Deps(newV8Version);
+            if (deps.length === 0) return;
+            for (const dep of deps) {
+                if (dep.gitignore) {
+                    if (typeof dep.gitignore === 'string') {
+                        await addToGitignore(ctx.nodeDir, dep.gitignore);
+                    } else {
+                        await replaceGitignore(ctx.nodeDir, dep.gitignore);
                     }
-                    const [repo, commit] = yield readDeps(ctx.nodeDir, dep.repo);
-                    const thePath = path.join(ctx.nodeDir, 'deps/v8', dep.path);
-                    yield fetchFromGit(thePath, repo, commit);
                 }
-            });
+                const [repo, commit] = await readDeps(ctx.nodeDir, dep.repo);
+                const thePath = path.join(ctx.nodeDir, 'deps/v8', dep.path);
+                await fetchFromGit(thePath, repo, commit);
+            }
         }
     };
 }
@@ -98,20 +104,20 @@ function execGitV8(...options) {
     return execa('git', options, v8ExecOptions);
 }
 
-function* addToGitignore(nodeDir, value) {
+async function addToGitignore(nodeDir, value) {
     const gitignorePath = path.join(nodeDir, 'deps/v8/.gitignore');
-    yield fs.appendFile(gitignorePath, value + '\n');
+    await fs.appendFile(gitignorePath, value + '\n');
 }
 
-function* replaceGitignore(nodeDir, options) {
+async function replaceGitignore(nodeDir, options) {
     const gitignorePath = path.join(nodeDir, 'deps/v8/.gitignore');
-    let gitignore = yield fs.readFile(gitignorePath, 'utf8');
+    let gitignore = await fs.readFile(gitignorePath, 'utf8');
     gitignore = gitignore.replace(options.match, options.replace);
-    yield fs.writeFile(gitignorePath, gitignore);
+    await fs.writeFile(gitignorePath, gitignore);
 }
 
-function* readDeps(nodeDir, depName) {
-    const depsStr = fs.readFileSync(path.join(nodeDir, 'deps/v8/DEPS'), 'utf8');
+async function readDeps(nodeDir, depName) {
+    const depsStr = await fs.readFile(path.join(nodeDir, 'deps/v8/DEPS'), 'utf8');
     const start = depsStr.indexOf('deps');
     const end = depsStr.indexOf('}', start) + 1;
     const Var = () => chromiumGit;
@@ -121,13 +127,13 @@ function* readDeps(nodeDir, depName) {
     return dep.split('@');
 }
 
-function* fetchFromGit(cwd, repo, commit) {
+async function fetchFromGit(cwd, repo, commit) {
     mkdirp.sync(cwd);
-    yield exec('init');
-    yield exec('remote', 'add', 'origin', repo);
-    yield exec('fetch', 'origin', commit);
-    yield exec('reset', '--hard', 'FETCH_HEAD');
-    yield rimraf(path.join(cwd, '.git'));
+    await exec('init');
+    await exec('remote', 'add', 'origin', repo);
+    await exec('fetch', 'origin', commit);
+    await exec('reset', '--hard', 'FETCH_HEAD');
+    await rimraf(path.join(cwd, '.git'));
 
     function exec(...options) {
         return execa('git', options, {cwd});

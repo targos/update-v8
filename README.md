@@ -8,6 +8,9 @@ CLI to simplify updates of V8 in the Node.js project
 $ npm install -g update-v8
 ```
 
+Please note that this tool uses `async/await` syntax and therefore requires Node.js
+7.6.0 or higher.
+
 ## Usage
 
 This tool will maintain a clone of the V8 repository in `~/.update-v8/v8`

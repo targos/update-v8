@@ -1,6 +1,5 @@
 'use strict';
 
-const co = require('co');
 const execa = require('execa');
 const fs = require('fs-promise');
 const Listr = require('listr');

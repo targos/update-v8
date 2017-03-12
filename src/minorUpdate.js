@@ -1,6 +1,5 @@
 'use strict';
 
-const co = require('co');
 const execa = require('execa');
 const fs = require('fs-promise');
 const Listr = require('listr');
@@ -47,7 +46,7 @@ function minorUpdate() {
         task: (ctx, task) => {
             const latestStr = ctx.latestVersion.join('.');
             task.title = `Do minor update to ${latestStr}`;
-            return co(doMinorUpdate, ctx, latestStr);
+            return doMinorUpdate(ctx, latestStr);
         },
         skip: (ctx) => {
             if (ctx.currentVersion >= ctx.latestVersion) {
@@ -58,17 +57,17 @@ function minorUpdate() {
     };
 }
 
-function* doMinorUpdate(ctx, latestStr) {
+async function doMinorUpdate(ctx, latestStr) {
     const currentStr = ctx.currentVersion.join('.');
-    const diff = yield execa.stdout('git', ['format-patch', '--stdout', `${currentStr}...${latestStr}`], {cwd: v8CloneDir});
+    const diff = await execa.stdout('git', ['format-patch', '--stdout', `${currentStr}...${latestStr}`], {cwd: v8CloneDir});
     try {
-        yield execa('git', ['apply', '--directory', 'deps/v8'], {
+        await execa('git', ['apply', '--directory', 'deps/v8'], {
             cwd: ctx.nodeDir,
             input: diff
         });
     } catch (e) {
         const file = path.join(ctx.nodeDir, `${latestStr}.diff`);
-        yield fs.writeFile(file, diff);
+        await fs.writeFile(file, diff);
         throw new Error(`Could not apply patch.\n${e}\nDiff was stored in ${file}`);
     }
 }

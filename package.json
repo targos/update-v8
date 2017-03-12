@@ -19,15 +19,17 @@
   },
   "homepage": "https://github.com/targos/update-v8#readme",
   "dependencies": {
-    "co": "^4.6.0",
     "execa": "^0.6.0",
-    "fs-promise": "^1.0.0",
-    "listr": "^0.10.0",
+    "fs-promise": "^2.0.0",
+    "listr": "^0.11.0",
     "log-symbols": "^1.0.2",
     "meow": "^3.7.0",
     "mkdirp": "^0.5.1",
     "rimraf": "^2.5.4",
     "rimraf-then": "^1.0.1",
-    "update-notifier": "^1.0.3"
+    "update-notifier": "^2.1.0"
+  },
+  "engines": {
+    "node": ">=7.6.0"
   }
 }
