@@ -29,13 +29,18 @@ module.exports = function () {
 function getLatestV8Version() {
     return {
         title: 'Get latest V8 version',
-        task: (ctx) => {
-            const currentV8Tag = ctx.currentVersion.slice(0, 3).join('.');
-            return execa.stdout('git', ['tag', '-l', `${currentV8Tag}.*`], {cwd: v8CloneDir})
-                .then(tags => {
-                    tags = toSortedArray(tags);
-                    ctx.latestVersion = tags[0];
-                });
+        task: async (ctx) => {
+            let currentV8Tag;
+            if (ctx.currentVersion[3] === '0') {
+                // prerelease
+                currentV8Tag = ctx.currentVersion.slice(0, 2).join('.');
+                ctx.currentVersion = ctx.currentVersion.slice(0, 3);
+            } else {
+                currentV8Tag = ctx.currentVersion.slice(0, 3).join('.');
+            }
+            let tags = await execa.stdout('git', ['tag', '-l', `${currentV8Tag}.*`, '--sort=version:refname'], {cwd: v8CloneDir});
+            tags = tags.split(/[\r\n]+/);
+            ctx.latestVersion = tags[tags.length - 1].split('.');
         }
     };
 }
@@ -49,7 +54,7 @@ function minorUpdate() {
             return doMinorUpdate(ctx, latestStr);
         },
         skip: (ctx) => {
-            if (ctx.currentVersion >= ctx.latestVersion) {
+            if (isHigherOrEqual(ctx.currentVersion, ctx.latestVersion)) {
                 ctx.skipped = true;
                 return true;
             }
@@ -72,13 +77,9 @@ async function doMinorUpdate(ctx, latestStr) {
     }
 }
 
-function toSortedArray(tags) {
-    return tags.split(/[\r\n]+/)
-        .filter(tag => tag !== '')
-        .map(tag => tag.split('.'))
-        .sort(sortVersions);
-}
-
-function sortVersions(v1, v2) {
-    return v2[3] - v1[3];
+function isHigherOrEqual(version1, version2) {
+    for (let i = 0; i < version1.length; i++) {
+        if (Number(version1[i] < Number(version2[i]))) return false;
+    }
+    return true;
 }
