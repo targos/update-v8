@@ -91,8 +91,7 @@ function incrementV8Version() {
     return {
         title: 'Increment V8 version',
         task: (ctx) => {
-            const version = ctx.currentVersion;
-            const incremented = Number(ctx.currentVersion[3]) + 1;
+            const incremented = ctx.currentVersion[3] + 1;
             const versionHPath = ctx.nodeDir + '/deps/v8/include/v8-version.h';
             return fs.readFile(versionHPath, 'utf8')
                 .then(versionH => {

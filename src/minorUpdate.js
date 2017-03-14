@@ -44,12 +44,15 @@ function minorUpdate() {
     return {
         title: 'Do minor update',
         task: (ctx, task) => {
+            if (ctx.latestVersion.length === 3) {
+                throw new Error('minor update can only be done on release branches');
+            }
             const latestStr = ctx.latestVersion.join('.');
             task.title = `Do minor update to ${latestStr}`;
             return doMinorUpdate(ctx, latestStr);
         },
         skip: (ctx) => {
-            if (ctx.currentVersion >= ctx.latestVersion) {
+            if (ctx.currentVersion[3] >= ctx.latestVersion[3]) {
                 ctx.skipped = true;
                 return true;
             }
