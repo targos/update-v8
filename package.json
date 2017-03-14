@@ -19,7 +19,7 @@
   },
   "homepage": "https://github.com/targos/update-v8#readme",
   "dependencies": {
-    "execa": "^0.6.0",
+    "execa": "^0.6.1",
     "fs-promise": "^2.0.0",
     "listr": "^0.11.0",
     "log-symbols": "^1.0.2",

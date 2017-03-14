@@ -218,9 +218,9 @@ execa@^0.4.0:
     path-key "^1.0.0"
     strip-eof "^1.0.0"
 
-execa@^0.6.0:
-  version "0.6.0"
-  resolved "https://registry.yarnpkg.com/execa/-/execa-0.6.0.tgz#934fc9f04a9febb4d4b449d976e92cfd95ef4f6e"
+execa@^0.6.1:
+  version "0.6.1"
+  resolved "https://registry.yarnpkg.com/execa/-/execa-0.6.1.tgz#79eda42ade78c387718b0aad48e0f573b5525cde"
   dependencies:
     cross-spawn "^5.0.1"
     get-stream "^3.0.0"
