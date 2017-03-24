@@ -25,7 +25,7 @@ module.exports = function () {
 function fetchOrigin() {
     return {
         title: 'Fetch V8',
-        task: (ctx) => {
+        task: (ctx, task) => {
             return execa('git', ['fetch', 'origin'], {cwd: v8CloneDir})
                 .catch(e => {
                     if (e.code === 'ENOENT') {
