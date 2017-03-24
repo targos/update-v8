@@ -35,18 +35,22 @@ module.exports = function () {
     };
 };
 
+const versionReg = /^\d+(\.\d+)+$/;
 function checkoutBranch() {
     return {
         title: 'Checkout V8 branch',
         task: async (ctx) => {
             let branch = ctx.branch;
             await execGitV8('checkout', 'origin/master');
-            if (branch === 'lkgr') {
+            if (!versionReg.test(branch)) {
                 // try to get the latest tag
-                const res = await execGitV8('tag', '--contains', '4f426e1', '--sort', 'version:refname');
+                const res = await execGitV8('tag', '--contains', branch, '--sort', 'version:refname');
                 const tags = res.stdout.split('\n');
                 const lastTag = tags[tags.length - 1];
                 if (lastTag) branch = ctx.branch = lastTag;
+            }
+            if (branch === ctx.currentVersion.join('.')) {
+                throw new Error('Current version is already ' + branch);
             }
             try {
                 await execGitV8('branch', '-D', branch);
