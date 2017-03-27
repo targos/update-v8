@@ -40,8 +40,7 @@ function checkoutBranch() {
     return {
         title: 'Checkout V8 branch',
         task: async (ctx) => {
-            let branch = ctx.branch;
-            let version = branch;
+            let version = ctx.branch;
             await execGitV8('checkout', 'origin/master');
             if (!versionReg.test(version)) {
                 // try to get the latest tag
@@ -51,16 +50,16 @@ function checkoutBranch() {
                 if (lastTag) version = lastTag;
                 if (version.split('.').length === 3) {
                     // Prerelease versions are branched and 'lkgr' does not include the version commit
-                    branch = version;
+                    ctx.branch = version;
                 }
             }
             if (version === ctx.currentVersion.join('.')) {
                 throw new Error('Current version is already ' + version);
             }
             try {
-                await execGitV8('branch', '-D', branch);
+                await execGitV8('branch', '-D', ctx.branch);
             } catch (e) {}
-            await execGitV8('branch', branch, `origin/${branch}`);
+            await execGitV8('branch', ctx.branch, `origin/${ctx.branch}`);
         }
     };
 }
