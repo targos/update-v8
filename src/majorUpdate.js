@@ -49,6 +49,10 @@ function checkoutBranch() {
                 const tags = res.stdout.split('\n');
                 const lastTag = tags[tags.length - 1];
                 if (lastTag) version = lastTag;
+                if (version.split('.').length === 3) {
+                    // Prerelease versions are branched and 'lkgr' does not include the version commit
+                    branch = version;
+                }
             }
             if (version === ctx.currentVersion.join('.')) {
                 throw new Error('Current version is already ' + version);
