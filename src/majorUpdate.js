@@ -40,7 +40,7 @@ function checkoutBranch() {
     return {
         title: 'Checkout V8 branch',
         task: async (ctx) => {
-            const branch = ctx.branch;
+            let branch = ctx.branch;
             let version = branch;
             await execGitV8('checkout', 'origin/master');
             if (!versionReg.test(version)) {
