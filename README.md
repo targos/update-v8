@@ -38,6 +38,10 @@ Specify path to the Node.js git repository. Defaults to current working director
 
 #### `--verbose`
 
+#### `--base-dir=/path/to/base/dir`
+
+Specify path where V8 clone will be maintained. Defaults to `~/.update-v8`.
+
 ## License
 
 [MIT](./LICENSE)

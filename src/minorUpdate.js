@@ -8,10 +8,6 @@ const path = require('path');
 const common = require('./common');
 const util = require('./util');
 
-const {
-    v8CloneDir
-} = require('./constants');
-
 module.exports = function () {
     return {
         title: 'Minor V8 update',
@@ -31,7 +27,7 @@ function getLatestV8Version() {
         title: 'Get latest V8 version',
         task: (ctx) => {
             const currentV8Tag = ctx.currentVersion.slice(0, 3).join('.');
-            return execa.stdout('git', ['tag', '-l', `${currentV8Tag}.*`], {cwd: v8CloneDir})
+            return execa.stdout('git', ['tag', '-l', `${currentV8Tag}.*`], {cwd: ctx.v8CloneDir})
                 .then(tags => {
                     tags = toSortedArray(tags);
                     ctx.latestVersion = tags[0];
@@ -62,7 +58,7 @@ function minorUpdate() {
 
 async function doMinorUpdate(ctx, latestStr) {
     const currentStr = ctx.currentVersion.join('.');
-    const diff = await execa.stdout('git', ['format-patch', '--stdout', `${currentStr}...${latestStr}`], {cwd: v8CloneDir});
+    const diff = await execa.stdout('git', ['format-patch', '--stdout', `${currentStr}...${latestStr}`], {cwd: ctx.v8CloneDir});
     try {
         await execa('git', ['apply', '--directory', 'deps/v8'], {
             cwd: ctx.nodeDir,

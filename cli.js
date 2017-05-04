@@ -7,6 +7,7 @@ const meow = require('meow');
 const path = require('path');
 const updateNotifier = require('update-notifier');
 
+const constants = require('./src/constants');
 const updateV8 = require('.');
 
 const cli = meow(`
@@ -20,6 +21,7 @@ Options
   --verbose Enable verbose output.
   --branch Specify a branch for major update.
   --sha Specify the SHA of the commit to backport.
+  --base-dir Specify the directory where V8 should be cloned. Default is '~/.update-v8'
 `);
 
 updateNotifier({pkg: cli.pkg}).notify();
@@ -32,6 +34,8 @@ const defaultOptions = {
 
 const options = Object.assign({}, defaultOptions, cli.flags);
 options.nodeDir = path.resolve(options.nodeDir);
+options.baseDir = path.resolve(options.baseDir || constants.defaultBaseDir);
+options.v8CloneDir = path.join(options.baseDir, 'v8');
 
 return Promise
     .resolve()

@@ -11,11 +11,9 @@ const common = require('./common');
 const util = require('./util');
 
 const {
-    chromiumGit,
-    v8CloneDir
+    chromiumGit
 } = require('./constants');
 
-const v8ExecOptions = {cwd: v8CloneDir};
 const noop = () => {};
 
 module.exports = function () {
@@ -41,10 +39,11 @@ function checkoutBranch() {
         title: 'Checkout V8 branch',
         task: async (ctx) => {
             let version = ctx.branch;
+            const v8ExecOptions = {cwd: ctx.v8CloneDir};
             await execGitV8('checkout', 'origin/master');
             if (!versionReg.test(version)) {
                 // try to get the latest tag
-                const res = await execGitV8('tag', '--contains', version, '--sort', 'version:refname');
+                const res = await execGitV8('tag', '--contains', `origin/${version}`, '--sort', 'version:refname');
                 const tags = res.stdout.split('\n');
                 const lastTag = tags[tags.length - 1];
                 if (lastTag) version = lastTag;
@@ -60,6 +59,10 @@ function checkoutBranch() {
                 await execGitV8('branch', '-D', ctx.branch);
             } catch (e) {}
             await execGitV8('branch', ctx.branch, `origin/${ctx.branch}`);
+
+            function execGitV8(...options) {
+                return execa('git', options, v8ExecOptions);
+            }
         }
     };
 }
@@ -74,7 +77,7 @@ function removeDepsV8() {
 function cloneLocalV8() {
     return {
         title: 'Clone branch to deps/v8',
-        task: (ctx) => execa('git', ['clone', '-b', ctx.branch, v8CloneDir, 'deps/v8'], {cwd: ctx.nodeDir})
+        task: (ctx) => execa('git', ['clone', '-b', ctx.branch, ctx.v8CloneDir, 'deps/v8'], {cwd: ctx.nodeDir})
     };
 }
 
@@ -106,10 +109,6 @@ function updateV8Deps() {
             }
         }
     };
-}
-
-function execGitV8(...options) {
-    return execa('git', options, v8ExecOptions);
 }
 
 async function addToGitignore(nodeDir, value) {

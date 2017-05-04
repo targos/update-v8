@@ -8,11 +8,6 @@ const path = require('path');
 const common = require('./common');
 const util = require('./util');
 
-const {
-    v8CloneDir
-} = require('./constants');
-
-const v8ExecOptions = {cwd: v8CloneDir};
 
 exports.doBackport = function doBackport() {
     return {
@@ -64,6 +59,10 @@ function generatePatch() {
             }).catch(function (e) {
                 throw new Error(e.stderr);
             });
+
+            function execGitV8(...options) {
+                return execa('git', options, {cwd: ctx.v8CloneDir});
+            }
         }
     };
 }
@@ -102,6 +101,3 @@ function incrementV8Version() {
     };
 }
 
-function execGitV8(...options) {
-    return execa('git', options, v8ExecOptions);
-}

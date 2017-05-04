@@ -3,10 +3,9 @@
 const execa = require('execa');
 const Listr = require('listr');
 const mkdirp = require('mkdirp');
+const path = require('path');
 
 const {
-    baseDir,
-    v8CloneDir,
     v8Git
 } = require('./constants');
 
@@ -26,7 +25,7 @@ function fetchOrigin() {
     return {
         title: 'Fetch V8',
         task: (ctx, task) => {
-            return execa('git', ['fetch', 'origin'], {cwd: v8CloneDir})
+            return execa('git', ['fetch', 'origin'], {cwd: ctx.v8CloneDir})
                 .catch(e => {
                     if (e.code === 'ENOENT') {
                         ctx.shouldClone = true;
@@ -42,9 +41,9 @@ function fetchOrigin() {
 function createClone() {
     return {
         title: 'Clone V8',
-        task: () => {
-            mkdirp.sync(baseDir);
-            return execa('git', ['clone', v8Git], {cwd: baseDir});
+        task: (ctx) => {
+            mkdirp.sync(ctx.baseDir);
+            return execa('git', ['clone', v8Git], {cwd: ctx.baseDir});
         },
         enabled: (ctx) => ctx.shouldClone
     };

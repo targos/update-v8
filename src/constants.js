@@ -3,13 +3,11 @@
 const homedir = require('os').homedir();
 const path = require('path');
 
-const baseDir = path.join(homedir, '.update-v8');
 const chromiumGit = 'https://chromium.googlesource.com';
 
-exports.baseDir = baseDir;
+exports.defaultBaseDir = path.join(homedir, '.update-v8');
 exports.chromiumGit = chromiumGit;
 
-exports.v8CloneDir = path.join(baseDir, 'v8');
 exports.v8Git = chromiumGit + '/v8/v8.git';
 exports.v8Deps = [
     {
