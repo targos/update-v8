@@ -1,6 +1,6 @@
 {
   "name": "update-v8",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "description": "CLI to simplify updates to V8 in the Node.js project",
   "main": "src/index.js",
   "scripts": {
