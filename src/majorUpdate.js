@@ -1,7 +1,7 @@
 'use strict';
 
 const execa = require('execa');
-const fs = require('fs-promise');
+const fs = require('fs-extra');
 const Listr = require('listr');
 const mkdirp = require('mkdirp');
 const path = require('path');
