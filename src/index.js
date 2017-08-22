@@ -31,7 +31,7 @@ exports.minor = function (options) {
 exports.backport = function (options) {
     const tasks = new Listr([
         updateV8Clone(),
-        backport.doBackport(),
+        backport.doBackport(options),
         backport.commitBackport()
     ], getOptions(options));
     return tasks.run(options);

@@ -6,20 +6,21 @@ const Listr = require('listr');
 const path = require('path');
 
 const common = require('./common');
-const util = require('./util');
 
-
-exports.doBackport = function doBackport() {
+exports.doBackport = function doBackport(options) {
+    const todo = [
+        common.checkCwd(),
+        common.getCurrentV8Version(),
+        generatePatch(),
+        applyPatch()
+    ];
+    if (options.bump !== false) {
+        todo.push(incrementV8Version());
+    }
     return {
         title: 'V8 commit backport',
         task: () => {
-            return new Listr([
-                common.checkCwd(),
-                common.getCurrentV8Version(),
-                generatePatch(),
-                applyPatch(),
-                incrementV8Version()
-            ]);
+            return new Listr(todo);
         }
     };
 };
@@ -100,4 +101,3 @@ function incrementV8Version() {
         }
     };
 }
-

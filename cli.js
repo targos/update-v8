@@ -21,6 +21,7 @@ Options
   --verbose Enable verbose output.
   --branch Specify a branch for major update.
   --sha Specify the SHA of the commit to backport.
+  --no-bump Do not bump V8 version (only applies to backport command)
   --base-dir Specify the directory where V8 should be cloned. Default is '~/.update-v8'
 `);
 
