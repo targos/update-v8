@@ -25,13 +25,11 @@ module.exports = function () {
 function getLatestV8Version() {
     return {
         title: 'Get latest V8 version',
-        task: (ctx) => {
+        task: async (ctx) => {
             const currentV8Tag = ctx.currentVersion.slice(0, 3).join('.');
-            return execa.stdout('git', ['tag', '-l', `${currentV8Tag}.*`], {cwd: ctx.v8CloneDir})
-                .then(tags => {
-                    tags = toSortedArray(tags);
-                    ctx.latestVersion = tags[0];
-                });
+            let tags = await execa.stdout('git', ['tag', '-l', `${currentV8Tag}.*`], {cwd: ctx.v8CloneDir});
+            tags = toSortedArray(tags);
+            ctx.latestVersion = tags[0];
         }
     };
 }

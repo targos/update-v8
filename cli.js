@@ -44,7 +44,9 @@ return Promise
         if (cli.input.length !== 1) {
             cli.showHelp();
         } else {
-            switch (cli.input[0].toLowerCase()) {
+            const kind = cli.input[0].toLowerCase();
+            options[kind] = true;
+            switch (kind) {
                 case 'minor':
                     return updateV8.minor(options);
                 case 'major':
