@@ -32,15 +32,19 @@ If the `git apply` command fails, a patch file will be written in the current di
 
 ### Options
 
+#### `--no-bump`
+
+Do not bump the patch number. Useful if the current V8 version is still supported by the V8 team.
+
 #### `--node-dir=/path/to/node`
 
 Specify path to the Node.js git repository. Defaults to current working directory.
 
-#### `--verbose`
-
 #### `--base-dir=/path/to/base/dir`
 
 Specify path where V8 clone will be maintained. Defaults to `~/.update-v8`.
+
+#### `--verbose`
 
 ## License
 
