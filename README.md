@@ -34,7 +34,7 @@ If the `git apply` command fails, a patch file will be written in the current di
 
 #### `--no-bump`
 
-Do not bump the patch number. Useful if the current V8 version is still supported by the V8 team.
+In case of backports, do not bump the patch number. Useful if the current V8 version is still supported by the V8 team.
 
 #### `--node-dir=/path/to/node`
 
