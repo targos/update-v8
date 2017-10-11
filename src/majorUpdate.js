@@ -126,7 +126,7 @@ async function replaceGitignore(nodeDir, options) {
 async function readDeps(nodeDir, depName) {
     const depsStr = await fs.readFile(path.join(nodeDir, 'deps/v8/DEPS'), 'utf8');
     const start = depsStr.indexOf('deps');
-    const end = depsStr.indexOf('}', start) + 1;
+    const end = depsStr.indexOf('recursedeps', start);
     const Var = () => chromiumGit;
     let deps;
     eval(depsStr.substring(start, end));
