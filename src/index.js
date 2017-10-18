@@ -40,12 +40,6 @@ exports.backport = function (options) {
 
 function getOptions(opts) {
     return {
-        renderer: opts.verbose ? 'verbose' : 'default',
-        execGitNode(...options) {
-            return execa('git', options, {cwd: opts.nodeDir});
-        },
-        execGitV8(...options) {
-            return execa('git', options, {cwd: opts.v8CloneDir});
-        }
+        renderer: opts.verbose ? 'verbose' : 'default'
     };
 }

@@ -2,6 +2,7 @@
 
 'use strict';
 
+const execa = require('execa');
 const logSymbols = require('log-symbols');
 const meow = require('meow');
 const path = require('path');
@@ -21,7 +22,7 @@ Options
   --verbose Enable verbose output.
   --branch Specify a branch for major update.
   --sha Specify the SHA of the commit to backport.
-  --no-bump Do not bump V8 version (only applies to backport command)
+  --no-bump Do not bump V8 version or embedder version (only applies to backport command)
   --base-dir Specify the directory where V8 should be cloned. Default is '~/.update-v8'
 `);
 
@@ -37,6 +38,13 @@ const options = Object.assign({}, defaultOptions, cli.flags);
 options.nodeDir = path.resolve(options.nodeDir);
 options.baseDir = path.resolve(options.baseDir || constants.defaultBaseDir);
 options.v8CloneDir = path.join(options.baseDir, 'v8');
+
+options.execGitNode = function execGitNode(...args) {
+    return execa('git', args, {cwd: options.nodeDir});
+};
+options.execGitV8 = function execGitV8(...args) {
+    return execa('git', args, {cwd: options.v8CloneDir});
+};
 
 return Promise
     .resolve()

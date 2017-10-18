@@ -23,18 +23,19 @@ If the `git apply` command fails, a patch file will be written in the current di
 ### `update-v8 major --branch=branchName`
 
 Replaces `deps/v8` with the `lkgr` branch or with `branchName` if it is specified.
+Resets the embedder version number to 0.
 
 ### `update-v8 backport --sha=SHA`
 
 Fetches and applies the patch corresponding to SHA. Increments the V8 patch version
-and commits the changes.  
+or embedder version number and commits the changes.  
 If the `git apply` command fails, a patch file will be written in the current directory.
 
 ### Options
 
 #### `--no-bump`
 
-In case of backports, do not bump the patch number. Useful if the current V8 version is still supported by the V8 team.
+In case of backports, do not bump the V8 patch number or embedder string.
 
 #### `--node-dir=/path/to/node`
 
