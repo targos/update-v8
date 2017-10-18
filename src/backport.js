@@ -31,7 +31,8 @@ exports.commitBackport = function commitBackport() {
         task: (ctx) => {
             const messageTitle = `deps: cherry-pick ${ctx.sha.substring(0, 7)} from upstream V8`;
             const messageBody = `Original commit message:\n\n    ` +
-                ctx.message.replace(/\n/g, '\n    ');
+                ctx.message.replace(/\n/g, '\n    ') +
+                `\n\nRefs: https://github.com/v8/v8/commit/${ctx.sha}`;
 
             return execGitNode('add', 'deps/v8')
                 .then(() => execGitNode('commit', '-m', messageTitle, '-m', messageBody));
@@ -48,8 +49,8 @@ function generatePatch() {
         title: 'Generate patch',
         task: (ctx) => {
             const sha = ctx.sha;
-            if (!sha) {
-                throw new Error('Commit SHA is required');
+            if (!sha || sha.length !== 40) {
+                throw new Error('--sha option is required and must be 40 characters long');
             }
             return Promise.all([
                 execGitV8('format-patch', '--stdout', `${sha}^..${sha}`),
