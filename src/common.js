@@ -17,20 +17,19 @@ exports.getCurrentV8Version = function getCurrentV8Version() {
 exports.checkCwd = function checkCwd() {
     return {
         title: 'Check Node directory',
-        task: (ctx) => {
+        task: async (ctx) => {
             let isNode = false;
-            return fs.readFile(path.join(ctx.nodeDir, 'LICENSE'))
-                .then(function (license) {
-                    if (license.indexOf('Node.js is licensed for use as follows') === 0) {
-                        isNode = true
-                    }
-                })
-                .catch(() => {})
-                .then(function () {
-                    if (!isNode) {
-                        throw new Error('This does not seem to be the Node.js repository.\ncwd: ' + ctx.nodeDir);
-                    }
-                });
+            try {
+                const nodeVersion = await fs.readFile(path.join(ctx.nodeDir, 'src/node_version.h'));
+                const match = /#define NODE_MAJOR_VERSION (\d+)/.exec(nodeVersion);
+                if (match) {
+                    isNode = true;
+                    ctx.nodeMajorVersion = parseInt(match[1]);
+                }
+            } catch (e) {}
+            if (!isNode) {
+                throw new Error('This does not seem to be the Node.js repository.\ncwd: ' + ctx.nodeDir);
+            }
         }
     }
 };
