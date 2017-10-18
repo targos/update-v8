@@ -40,10 +40,10 @@ function checkoutBranch() {
         task: async (ctx) => {
             let version = ctx.branch;
             const v8ExecOptions = {cwd: ctx.v8CloneDir};
-            await execGitV8('checkout', 'origin/master');
+            await ctx.execGitV8('checkout', 'origin/master');
             if (!versionReg.test(version)) {
                 // try to get the latest tag
-                const res = await execGitV8('tag', '--contains', `origin/${version}`, '--sort', 'version:refname');
+                const res = await ctx.execGitV8('tag', '--contains', `origin/${version}`, '--sort', 'version:refname');
                 const tags = res.stdout.split('\n');
                 const lastTag = tags[tags.length - 1];
                 if (lastTag) version = lastTag;
@@ -56,13 +56,9 @@ function checkoutBranch() {
                 throw new Error('Current version is already ' + version);
             }
             try {
-                await execGitV8('branch', '-D', ctx.branch);
+                await ctx.execGitV8('branch', '-D', ctx.branch);
             } catch (e) {}
-            await execGitV8('branch', ctx.branch, `origin/${ctx.branch}`);
-
-            function execGitV8(...options) {
-                return execa('git', options, v8ExecOptions);
-            }
+            await ctx.execGitV8('branch', ctx.branch, `origin/${ctx.branch}`);
         }
     };
 }

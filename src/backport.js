@@ -28,18 +28,14 @@ exports.doBackport = function doBackport(options) {
 exports.commitBackport = function commitBackport() {
     return {
         title: 'Commit patch',
-        task: (ctx) => {
+        task: async (ctx) => {
             const messageTitle = `deps: cherry-pick ${ctx.sha.substring(0, 7)} from upstream V8`;
             const messageBody = `Original commit message:\n\n    ` +
                 ctx.message.replace(/\n/g, '\n    ') +
                 `\n\nRefs: https://github.com/v8/v8/commit/${ctx.sha}`;
 
-            return execGitNode('add', 'deps/v8')
-                .then(() => execGitNode('commit', '-m', messageTitle, '-m', messageBody));
-
-            function execGitNode(...options) {
-                return execa('git', options, {cwd: ctx.nodeDir});
-            }
+            await ctx.execGitNode('add', 'deps/v8');
+            await ctx.execGitNode('commit', '-m', messageTitle, '-m', messageBody);
         }
     }
 };
@@ -53,18 +49,14 @@ function generatePatch() {
                 throw new Error('--sha option is required and must be 40 characters long');
             }
             return Promise.all([
-                execGitV8('format-patch', '--stdout', `${sha}^..${sha}`),
-                execGitV8('log', '--format=%B', '-n', '1', sha),
+                ctx.execGitV8('format-patch', '--stdout', `${sha}^..${sha}`),
+                ctx.execGitV8('log', '--format=%B', '-n', '1', sha),
             ]).then(([patch, message]) => {
                 ctx.patch = patch.stdout;
                 ctx.message = message.stdout;
             }).catch(function (e) {
                 throw new Error(e.stderr);
             });
-
-            function execGitV8(...options) {
-                return execa('git', options, {cwd: ctx.v8CloneDir});
-            }
         }
     };
 }

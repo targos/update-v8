@@ -2,10 +2,24 @@
 
 const execa = require('execa');
 const fs = require('fs-extra');
+const Listr = require('listr');
+const path = require('path');
 
 const util = require('./util');
 
 module.exports = function () {
+    return {
+        title: `Update version numbers`,
+        task: () => {
+            return new Listr([
+                bumpNodeModule(),
+                resetEmbedderString()
+            ]);
+        }
+    };
+};
+
+function bumpNodeModule() {
     return {
         title: 'Bump NODE_MODULE_VERSION',
         task: async (ctx, task) => {
@@ -17,15 +31,11 @@ module.exports = function () {
                 return;
             }
             updateModuleVersion(ctx.nodeDir, newModuleVersion);
-            await execGitNode('add', 'src/node_version.h');
-            await execGitNode('commit', '-m', getCommitTitle(newModuleVersion), '-m', getCommitBody(v8Version));
-
-            function execGitNode(...options) {
-                return execa('git', options, {cwd: ctx.nodeDir});
-            }
+            await ctx.execGitNode('add', 'src/node_version.h');
+            await ctx.execGitNode('commit', '-m', getCommitTitle(newModuleVersion), '-m', getCommitBody(v8Version));
         }
     };
-};
+}
 
 function getModuleVersion(nodeDir) {
     const nodeVersionH = fs.readFileSync(nodeDir + '/src/node_version.h', 'utf8');
@@ -53,4 +63,25 @@ function getCommitBody(v8Version) {
 versions. This commit adapts NODE_MODULE_VERSION for V8 ${v8Version[0]}.${v8Version[1]}.
 
 Refs: https://github.com/nodejs/CTC/blob/master/meetings/2016-09-28.md`;
+}
+
+const embedderRegex = /'v8_embedder_string': '-node\.(\d+)'/;
+const embedderString = "'v8_embedder_string': '-node.0'";
+function resetEmbedderString() {
+    return {
+        title: 'Reset V8 embedder version string',
+        task: async (ctx) => {
+            const commonGypiPath = path.join(ctx.nodeDir, 'common.gypi')
+            const commonGypi = await fs.readFile(commonGypiPath, 'utf8');
+            const embedderValue = embedderRegex.exec(commonGypi)[1];
+            if (embedderValue !== '0') {
+                await fs.writeFile(commonGypiPath, commonGypi.replace(embedderRegex, embedderString));
+                await ctx.execGitNode('add', 'common.gypi');
+                await ctx.execGitNode('commit', '-m', 'build: reset embedder string to "-node.0"');
+            } else {
+                return ctx.skip('Embedder version is already 0');
+            }
+        },
+        skip: (ctx) => !!ctx.nodeMajorVersion < 9
+    }
 }

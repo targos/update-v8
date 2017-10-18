@@ -1,9 +1,10 @@
 'use strict';
 
+const execa = require('execa');
 const Listr = require('listr');
 
 const backport = require('./backport');
-const bumpNodeModule = require('./bumpNodeModule');
+const updateVersionNumbers = require('./updateVersionNumbers');
 const commitUpdate = require('./commitUpdate');
 const majorUpdate = require('./majorUpdate');
 const minorUpdate = require('./minorUpdate');
@@ -14,7 +15,7 @@ exports.major = function (options) {
         updateV8Clone(),
         majorUpdate(),
         commitUpdate(),
-        bumpNodeModule()
+        updateVersionNumbers()
     ], getOptions(options));
     return tasks.run(options);
 };
@@ -39,6 +40,12 @@ exports.backport = function (options) {
 
 function getOptions(opts) {
     return {
-        renderer: opts.verbose ? 'verbose' : 'default'
+        renderer: opts.verbose ? 'verbose' : 'default',
+        execGitNode(...options) {
+            return execa('git', options, {cwd: opts.nodeDir});
+        },
+        execGitV8(...options) {
+            return execa('git', options, {cwd: opts.v8CloneDir});
+        }
     };
 }
