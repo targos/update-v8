@@ -30,7 +30,7 @@ function bumpNodeModule() {
                 task.skip('version is the same');
                 return;
             }
-            updateModuleVersion(ctx.nodeDir, newModuleVersion);
+            updateModuleVersion(ctx.nodeDir, newModuleVersion, v8Version);
             await ctx.execGitNode('add', 'src/node_version.h');
             await ctx.execGitNode('commit', '-m', getCommitTitle(newModuleVersion), '-m', getCommitBody(v8Version));
         }
@@ -43,10 +43,17 @@ function getModuleVersion(nodeDir) {
     return parseInt(version);
 }
 
-function updateModuleVersion(nodeDir, newVersion) {
+const v8VerReg = / * V8 \d+\.\d+: \d+/g;
+function updateModuleVersion(nodeDir, newVersion, v8Version) {
     const path = nodeDir + '/src/node_version.h';
     let nodeVersionH = fs.readFileSync(path, 'utf8');
     nodeVersionH = nodeVersionH.replace(/NODE_MODULE_VERSION \d+/, `NODE_MODULE_VERSION ${newVersion}`);
+    let index = -1;
+    while(v8VerReg.exec(nodeVersionH)) index = v8VerReg.lastIndex;
+    nodeVersionH =
+        nodeVersionH.substring(0, index) +
+        `\n * V8 ${v8Version[0]}.${v8Version[1]}: ${newVersion}` +
+        nodeVersionH.substring(index);
     fs.writeFileSync(path, nodeVersionH);
 }
 
