@@ -71,7 +71,7 @@ function resetEmbedderString() {
     return {
         title: 'Reset V8 embedder version string',
         task: async (ctx) => {
-            const commonGypiPath = path.join(ctx.nodeDir, 'common.gypi')
+            const commonGypiPath = path.join(ctx.nodeDir, 'common.gypi');
             const commonGypi = await fs.readFile(commonGypiPath, 'utf8');
             const embedderValue = embedderRegex.exec(commonGypi)[1];
             if (embedderValue !== '0') {

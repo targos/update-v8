@@ -15,7 +15,11 @@ exports.doBackport = function doBackport(options) {
         applyPatch()
     ];
     if (options.bump !== false) {
-        todo.push(incrementV8Version());
+        if (ctx.nodeMajorVersion < 9) {
+            todo.push(incrementV8Version());
+        } else {
+            todo.push(incrementEmbedderVersion());
+        }
     }
     return {
         title: 'V8 commit backport',
@@ -83,14 +87,27 @@ function applyPatch() {
 function incrementV8Version() {
     return {
         title: 'Increment V8 version',
-        task: (ctx) => {
+        task: async (ctx) => {
             const incremented = ctx.currentVersion[3] + 1;
             const versionHPath = ctx.nodeDir + '/deps/v8/include/v8-version.h';
-            return fs.readFile(versionHPath, 'utf8')
-                .then(versionH => {
-                    versionH = versionH.replace(/V8_PATCH_LEVEL (\d+)/, `V8_PATCH_LEVEL ${incremented}`);
-                    return fs.writeFile(versionHPath, versionH);
-                });
+            let versionH = await fs.readFile(versionHPath, 'utf8');
+            versionH = versionH.replace(/V8_PATCH_LEVEL (\d+)/, `V8_PATCH_LEVEL ${incremented}`);
+            await fs.writeFile(versionHPath, versionH);
+        }
+    };
+}
+
+const embedderRegex = /'v8_embedder_string': '-node\.(\d+)'/;
+function incrementEmbedderVersion() {
+    return {
+        title: 'Increment embedder version number',
+        task: async (ctx) => {
+            const commonGypiPath = path.join(ctx.nodeDir, 'common.gypi');
+            const commonGypi = await fs.readFile(commonGypiPath, 'utf8');
+            const embedderValue = parseInt(embedderRegex.exec(commonGypi)[1]);
+            const embedderString = `'v8_embedder_string': '-node.${embedderValue + 1}'`;
+            await fs.writeFile(commonGypiPath, commonGypi.replace(embedderRegex, embedderString));
+            await ctx.execGitNode('add', 'common.gypi');
         }
     };
 }
