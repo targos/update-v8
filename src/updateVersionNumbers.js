@@ -89,6 +89,6 @@ function resetEmbedderString() {
                 return ctx.skip('Embedder version is already 0');
             }
         },
-        skip: (ctx) => !!ctx.nodeMajorVersion < 9
+        skip: (ctx) => ctx.nodeMajorVersion < 9
     }
 }
