@@ -12,8 +12,8 @@ module.exports = function () {
         title: `Update version numbers`,
         task: () => {
             return new Listr([
-                bumpNodeModule(),
-                resetEmbedderString()
+                resetEmbedderString(),
+                bumpNodeModule()
             ]);
         }
     };
