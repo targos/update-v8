@@ -21,7 +21,7 @@
   "dependencies": {
     "execa": "^0.8.0",
     "fs-extra": "^4.0.2",
-    "listr": "^0.12.0",
+    "listr": "^0.13.0",
     "log-symbols": "^2.1.0",
     "meow": "^3.7.0",
     "mkdirp": "^0.5.1",
