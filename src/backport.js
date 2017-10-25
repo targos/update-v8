@@ -9,13 +9,12 @@ const common = require('./common');
 
 exports.doBackport = function doBackport(options) {
     const todo = [
-        common.checkCwd(),
         common.getCurrentV8Version(),
         generatePatch(),
         applyPatch()
     ];
     if (options.bump !== false) {
-        if (ctx.nodeMajorVersion < 9) {
+        if (options.nodeMajorVersion < 9) {
             todo.push(incrementV8Version());
         } else {
             todo.push(incrementEmbedderVersion());

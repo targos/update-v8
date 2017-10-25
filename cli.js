@@ -9,6 +9,7 @@ const path = require('path');
 const updateNotifier = require('update-notifier');
 
 const constants = require('./src/constants');
+const common = require('./src/common');
 const updateV8 = require('.');
 
 const cli = meow(`
@@ -48,10 +49,12 @@ options.execGitV8 = function execGitV8(...args) {
 
 return Promise
     .resolve()
-    .then(() => {
+    .then(async () => {
         if (cli.input.length !== 1) {
             cli.showHelp();
         } else {
+            await common.checkCwd(options);
+
             const kind = cli.input[0].toLowerCase();
             options[kind] = true;
             switch (kind) {

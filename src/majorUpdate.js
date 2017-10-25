@@ -21,7 +21,6 @@ module.exports = function () {
         title: `Major V8 update`,
         task: () => {
             return new Listr([
-                common.checkCwd(),
                 common.getCurrentV8Version(),
                 checkoutBranch(),
                 removeDepsV8(),

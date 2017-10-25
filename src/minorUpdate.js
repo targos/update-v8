@@ -13,7 +13,6 @@ module.exports = function () {
         title: 'Minor V8 update',
         task: () => {
             return new Listr([
-                common.checkCwd(),
                 common.getCurrentV8Version(),
                 getLatestV8Version(),
                 minorUpdate()
