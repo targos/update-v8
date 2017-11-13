@@ -77,7 +77,7 @@ const embedderString = "'v8_embedder_string': '-node.0'";
 function resetEmbedderString() {
     return {
         title: 'Reset V8 embedder version string',
-        task: async (ctx) => {
+        task: async (ctx, task) => {
             const commonGypiPath = path.join(ctx.nodeDir, 'common.gypi');
             const commonGypi = await fs.readFile(commonGypiPath, 'utf8');
             const embedderValue = embedderRegex.exec(commonGypi)[1];
@@ -86,7 +86,7 @@ function resetEmbedderString() {
                 await ctx.execGitNode('add', 'common.gypi');
                 await ctx.execGitNode('commit', '-m', 'build: reset embedder string to "-node.0"');
             } else {
-                return ctx.skip('Embedder version is already 0');
+                return task.skip('Embedder version is already 0');
             }
         },
         skip: (ctx) => ctx.nodeMajorVersion < 9
