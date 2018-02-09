@@ -24,13 +24,13 @@ module.exports = function () {
       return new Listr([
         common.getCurrentV8Version(),
         checkoutBranch(),
-        // moveGypfilesOut(),
+        moveGypfilesOut(),
         removeDepsV8(),
         cloneLocalV8(),
         removeDepsV8Git(),
-        updateV8Deps()
-        // moveGypfilesIn(),
-        // updateGypfiles()
+        updateV8Deps(),
+        moveGypfilesIn(),
+        updateGypfiles()
       ]);
     }
   };
@@ -63,6 +63,7 @@ function checkoutBranch() {
       if (version === ctx.currentVersion.join('.')) {
         throw new Error(`Current version is already ${version}`);
       }
+      ctx.newVersion = ctx.branch.split('.').map((s) => Number(s));
       try {
         await ctx.execGitV8('branch', '-D', ctx.branch);
       } catch (e) {

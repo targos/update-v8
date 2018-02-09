@@ -1,7 +1,5 @@
 'use strict';
 
-const execa = require('execa');
-
 const util = require('./util');
 
 module.exports = function () {
