@@ -4,7 +4,9 @@
   "description": "CLI to simplify updates to V8 in the Node.js project",
   "main": "src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "eslint": "eslint src cli.js",
+    "eslint-fix": "npm run eslint -- --fix",
+    "test": "npm run eslint"
   },
   "bin": "cli.js",
   "repository": {
@@ -31,5 +33,11 @@
   },
   "engines": {
     "node": ">=7.6.0"
+  },
+  "devDependencies": {
+    "eslint": "^4.17.0",
+    "eslint-config-cheminfo": "^1.15.1",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-jest": "^21.7.0"
   }
 }
