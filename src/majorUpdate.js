@@ -63,7 +63,7 @@ function checkoutBranch() {
       if (version === ctx.currentVersion.join('.')) {
         throw new Error(`Current version is already ${version}`);
       }
-      ctx.newVersion = ctx.branch.split('.').map((s) => Number(s));
+      ctx.newVersion = version.split('.').map((s) => parseInt(s, 10));
       try {
         await ctx.execGitV8('branch', '-D', ctx.branch);
       } catch (e) {
