@@ -18,17 +18,17 @@ module.exports = function () {
 function fetchOrigin() {
   return {
     title: 'Fetch V8',
-    task: (ctx, task) => {
-      return execa('git', ['fetch', 'origin'], { cwd: ctx.v8CloneDir }).catch(
-        (e) => {
-          if (e.code === 'ENOENT') {
-            ctx.shouldClone = true;
-            task.skip('V8 clone not present, create it.');
-          } else {
-            throw e;
-          }
+    task: async (ctx, task) => {
+      try {
+        await execa('git', ['fetch', 'origin'], { cwd: ctx.v8CloneDir });
+      } catch (e) {
+        if (e.code === 'ENOENT') {
+          ctx.shouldClone = true;
+          task.skip('V8 clone not present, create it.');
+        } else {
+          throw e;
         }
-      );
+      }
     }
   };
 }

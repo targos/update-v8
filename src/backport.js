@@ -47,24 +47,23 @@ exports.commitBackport = function commitBackport() {
 function generatePatch() {
   return {
     title: 'Generate patch',
-    task: (ctx) => {
+    task: async (ctx) => {
       const sha = ctx.sha;
       if (!sha || sha.length !== 40) {
         throw new Error(
           '--sha option is required and must be 40 characters long'
         );
       }
-      return Promise.all([
-        ctx.execGitV8('format-patch', '--stdout', `${sha}^..${sha}`),
-        ctx.execGitV8('log', '--format=%B', '-n', '1', sha)
-      ])
-        .then(([patch, message]) => {
-          ctx.patch = patch.stdout;
-          ctx.message = message.stdout;
-        })
-        .catch(function (e) {
-          throw new Error(e.stderr);
-        });
+      try {
+        const [patch, message] = await Promise.all([
+          ctx.execGitV8('format-patch', '--stdout', `${sha}^..${sha}`),
+          ctx.execGitV8('log', '--format=%B', '-n', '1', sha)
+        ]);
+        ctx.patch = patch.stdout;
+        ctx.message = message.stdout;
+      } catch (e) {
+        throw new Error(e.stderr);
+      }
     }
   };
 }
@@ -72,19 +71,20 @@ function generatePatch() {
 function applyPatch() {
   return {
     title: 'Apply patch to deps/v8',
-    task: (ctx) => {
+    task: async (ctx) => {
       const patch = ctx.patch;
-      return execa('git', ['apply', '-3', '--directory=deps/v8'], {
-        cwd: ctx.nodeDir,
-        input: patch
-      }).catch(function (e) {
-        const file = path.join(ctx.nodeDir, `${ctx.sha}.diff`);
-        return fs.writeFile(file, ctx.patch).then(function () {
-          throw new Error(
-            `Could not apply patch.\n${e}\nDiff was stored in ${file}`
-          );
+      try {
+        await execa('git', ['apply', '-3', '--directory=deps/v8'], {
+          cwd: ctx.nodeDir,
+          input: patch
         });
-      });
+      } catch (e) {
+        const file = path.join(ctx.nodeDir, `${ctx.sha}.diff`);
+        await fs.writeFile(file, ctx.patch);
+        throw new Error(
+          `Could not apply patch.\n${e}\nDiff was stored in ${file}`
+        );
+      }
     }
   };
 }

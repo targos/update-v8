@@ -6,7 +6,6 @@ const execa = require('execa');
 const fs = require('fs-extra');
 const Listr = require('listr');
 const mkdirp = require('mkdirp');
-const rimraf = require('rimraf-then');
 
 const common = require('./common');
 const util = require('./util');
@@ -77,7 +76,7 @@ function checkoutBranch() {
 function removeDepsV8() {
   return {
     title: 'Remove deps/v8',
-    task: (ctx) => rimraf(path.join(ctx.nodeDir, 'deps/v8'))
+    task: (ctx) => fs.remove(path.join(ctx.nodeDir, 'deps/v8'))
   };
 }
 
@@ -94,7 +93,7 @@ function cloneLocalV8() {
 function removeDepsV8Git() {
   return {
     title: 'Remove deps/v8/.git',
-    task: (ctx) => rimraf(path.join(ctx.nodeDir, 'deps/v8/.git'))
+    task: (ctx) => fs.remove(path.join(ctx.nodeDir, 'deps/v8/.git'))
   };
 }
 
@@ -152,7 +151,7 @@ async function fetchFromGit(cwd, repo, commit) {
   await exec('remote', 'add', 'origin', repo);
   await exec('fetch', 'origin', commit);
   await exec('reset', '--hard', 'FETCH_HEAD');
-  await rimraf(path.join(cwd, '.git'));
+  await fs.remove(path.join(cwd, '.git'));
 
   function exec(...options) {
     return execa('git', options, { cwd });
