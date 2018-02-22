@@ -48,8 +48,8 @@ function minorUpdate() {
     },
     skip: (ctx) => {
       if (ctx.currentVersion[3] >= ctx.latestVersion[3]) {
-        ctx.skipped = true;
-        return true;
+        ctx.skipped = 'V8 is up-to-date';
+        return ctx.skipped;
       }
       return false;
     }
