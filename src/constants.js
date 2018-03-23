@@ -9,6 +9,16 @@ exports.defaultBaseDir = path.join(homedir, '.update-v8');
 exports.chromiumGit = chromiumGit;
 
 exports.v8Git = `${chromiumGit}/v8/v8.git`;
+
+const googleTestReplace = `/third_party/googletest/src/*
+!/third_party/googletest/src/googletest
+/third_party/googletest/src/googletest/*
+!/third_party/googletest/src/googletest/include
+/third_party/googletest/src/googletest/include/*
+!/third_party/googletest/src/googletest/include/gtest
+/third_party/googletest/src/googletest/include/gtest/*
+!/third_party/googletest/src/googletest/include/gtest/gtest_prod.h`;
+
 exports.v8Deps = [
   {
     name: 'trace_event',
@@ -29,7 +39,8 @@ exports.v8Deps = [
       replace:
         '/testing/gtest/*\n!/testing/gtest/include\n/testing/gtest/include/*\n!/testing/gtest/include/gtest\n/testing/gtest/include/gtest/*\n!/testing/gtest/include/gtest/gtest_prod.h'
     },
-    since: 55
+    since: 55,
+    until: 66
   },
   {
     name: 'jinja2',
@@ -44,5 +55,15 @@ exports.v8Deps = [
     path: 'third_party/markupsafe',
     gitignore: '!/third_party/markupsafe',
     since: 56
+  },
+  {
+    name: 'googletest',
+    repo: 'v8/third_party/googletest/src',
+    path: 'third_party/googletest/src',
+    gitignore: {
+      match: '/third_party/googletest/src',
+      replace: googleTestReplace
+    },
+    since: 67
   }
 ];

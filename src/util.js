@@ -25,5 +25,7 @@ exports.getV8Deps = function getV8Deps(version) {
   const major = version[0];
   const minor = version[1];
   const number = major * 10 + minor;
-  return constants.v8Deps.filter((dep) => dep.since <= number);
+  return constants.v8Deps.filter(
+    (dep) => dep.since <= number && (dep.until || Infinity) >= number
+  );
 };
